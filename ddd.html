@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="ddd.css">
+    <title>운동 기록 캘린더</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .selected-date {
+            background-color: #d1ffd1;
+        }
+        .save-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+        .workout-entry {
+            font-size: 12px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+
+<h1>운동 기록 캘린더</h1>
+
+
+<!-- 운동 강도와 시간 선택 -->
+<label for="intensity">운동 강도:</label>
+<select id="intensity">
+    <option value="" disabled selected>선택</option> <!-- 기본값 '선택' -->
+    <option value="low">저강도</option>
+    <option value="medium">중강도</option>
+    <option value="high">고강도</option>
+</select>
+
+<br><br>
+
+<label for="time">일일 운동 시간:</label>
+<input type="number" id="hours" min="0" max="23" value="0"> 시간 
+<input type="number" id="minutes" min="0" max="59" value="0"> 분
+
+<br><br>
+
+<!-- 저장하기 버튼 -->
+<button id="saveButton" class="save-btn">저장하기</button>
+
+<br><br>
+
+<!-- 캘린더 -->
+<table id="calendar">
+    <thead>
+        <tr>
+            <th>일</th>
+            <th>월</th>
+            <th>화</th>
+            <th>수</th>
+            <th>목</th>
+            <th>금</th>
+            <th>토</th>
+        </tr>
+    </thead>
+    <tbody id="calendar-body">
+        <!-- 날짜가 여기에 생성됩니다 -->
+    </tbody>
+</table>
+
+
+    <style>
+        /* 기본 workout-entry 스타일 */
+        .workout-entry {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* 저강도 - 파란색 */
+        .low-intensity {
+            color: blue;
+        }
+
+        /* 중강도 - 주황색 */
+        .medium-intensity {
+            color: green;
+        }
+
+        /* 고강도 - 빨간색 */
+        .high-intensity {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+
+<br><br>
+
+<label for="time">일일 운동 시간:</label>
+<input type="number" id="hours" min="0" max="23" value="0"> 시간 
+<input type="number" id="minutes" min="0" max="59" value="0"> 분
+
+<br><br>
+
+<!-- 저장하기 버튼 -->
+<button id="saveButton" class="save-btn">저장하기</button>
+
+<br><br>
+
+<!-- 캘린더 -->
+<table id="calendar">
+    <thead>
+        <tr>
+            <th>일</th>
+            <th>월</th>
+            <th>화</th>
+            <th>수</th>
+            <th>목</th>
+            <th>금</th>
+            <th>토</th>
+        </tr>
+    </thead>
+    <tbody id="calendar-body">
+        <!-- 날짜가 여기에 생성됩니다 -->
+    </tbody>
+</table>
+
+<!-- 자바스크립트 코드 HTML 내 포함 -->
+<script>
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    const workoutData = {}; // 날짜별 운동 기록을 저장할 객체
+    let selectedDate = null; // 선택된 날짜 저장
+
+    // 캘린더 생성 함수
+    function generateCalendar(month, year) {
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        const calendarBody = document.getElementById('calendar-body');
+        calendarBody.innerHTML = ''; // 기존 내용 제거
+
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+            const row = document.createElement('tr');
+
+            for (let j = 0; j < 7; j++) {
+                const cell = document.createElement('td');
+                if (i === 0 && j < firstDay) {
+                    cell.innerHTML = '';
+                } else if (date > daysInMonth) {
+                    break;
+                } else {
+                    const dateKey = `${year}-${month + 1}-${date}`;
+                    cell.innerHTML = `<span>${date}</span><div class="workout-entry" id="${dateKey}"></div>`;
+                    cell.addEventListener('click', function() {
+                        selectedDate = dateKey;
+                        alert(`${selectedDate} 날짜가 선택되었습니다.`);
+                    });
+                    date++;
+                }
+                row.appendChild(cell);
+            }
+            calendarBody.appendChild(row);
+        }
+    }
+
+    // 운동 기록 저장 함수 (저장하기 버튼 클릭 시 실행)
+    document.getElementById('saveButton').addEventListener('click', function() {
+        if (!selectedDate) {
+            alert("먼저 날짜를 선택하세요.");
+            return;
+        }
+
+        const intensity = document.getElementById('intensity').value;
+        const hours = document.getElementById('hours').value;
+        const minutes = document.getElementById('minutes').value;
+
+        if (intensity === "") {
+            alert("운동 강도를 선택하세요.");
+            return;
+        }
+
+        const workoutEntry = `${intensity} 강도, ${hours}시간 ${minutes}분`;
+
+        // 운동 기록을 해당 날짜 셀에 출력
+        const workoutCell = document.getElementById(selectedDate);
+        workoutCell.textContent = workoutEntry;
+
+        // 기존 클래스 제거
+        workoutCell.classList.remove('low-intensity', 'medium-intensity', 'high-intensity');
+
+        // 운동 강도에 따라 색상을 적용
+        if (intensity === 'low') {
+            workoutCell.classList.add('low-intensity');
+        } else if (intensity === 'medium') {
+            workoutCell.classList.add('medium-intensity');
+        } else if (intensity === 'high') {
+            workoutCell.classList.add('high-intensity');
+        }
+
+        // 운동 기록을 객체에 저장
+        workoutData[selectedDate] = {
+            intensity: intensity,
+            time: `${hours}시간 ${minutes}분`
+        };
+
+        alert(`${selectedDate} 날짜에 ${workoutEntry} 운동이 기록되었습니다.`);
+    });
+
+    // 페이지 로드 시 현재 달의 캘린더를 생성
+    window.onload = function() {
+        generateCalendar(currentMonth, currentYear);
+    };
+</script>
+
+</body>
+</html>
+
